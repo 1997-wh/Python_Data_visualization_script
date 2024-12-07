@@ -8,20 +8,15 @@ import time
 import random
 import io
 
-# Initialize Flask app
 server = Flask(__name__)
 
-# Load initial dataset from CSV
 df = pd.read_csv('sample_data_visualization.csv')
 
-# Initialize Dash app
 app = dash.Dash(__name__, server=server)
 app.title = "Interactive Data Visualization Dashboard"
 
-# Store for annotations
 annotations_store = []
 
-# App layout
 app.layout = html.Div(id="main-container", children=[
     dcc.Store(id="theme-store", data="light"),
     html.H1("Interactive Data Visualization Dashboard", id="dashboard-title", style={"textAlign": "center"}),
@@ -121,7 +116,6 @@ app.layout = html.Div(id="main-container", children=[
     )
 ], style={"padding": "0", "margin": "0", "height": "100vh", "width": "100vw", "backgroundColor": "#ffffff"})
 
-# Callback for downloading data
 @app.callback(
     Output("download-dataframe-csv", "data"),
     [Input("download-btn", "n_clicks")]
@@ -134,7 +128,6 @@ def download_data(n_clicks):
     buffer.seek(0)
     return dcc.send_data_frame(df.to_csv, "real_time_data.csv")
 
-# Callback for updating summary statistics
 @app.callback(
     Output("summary-stats", "children"),
     [Input("value-range-slider", "value"), Input("category-dropdown", "value"), Input("region-dropdown", "value"), Input("interval-component", "n_intervals")]
@@ -149,7 +142,6 @@ def update_summary(value_range, selected_category, selected_region, n):
     else:
         return "No data available for the selected filters."
 
-# Callback for updating the main line chart and individual line charts
 @app.callback(
     [Output("main-line-chart", "figure"),
      Output("line-chart-a", "figure"),
@@ -196,7 +188,6 @@ def update_charts(value_range, selected_region, n, selected_categories):
 
     return main_line_chart, line_chart_a, line_chart_b, line_chart_c
 
-# Callback for updating graphs and managing annotations
 @app.callback(
     [Output("selected-point", "children"), Output("annotated-line-chart", "figure")],
     [Input("annotated-line-chart", "clickData"), Input("add-annotation-btn", "n_clicks"), Input("delete-annotations-btn", "n_clicks")],
@@ -207,7 +198,6 @@ def handle_annotation(click_data, add_clicks, delete_clicks, annotation_text):
     ctx = dash.callback_context
     selected_point_info = "Click on the chart to select a point for annotation."
 
-    # Check if there's clickData
     if click_data and "points" in click_data:
         selected_point = click_data["points"][0]
         selected_x = selected_point["x"]
@@ -226,7 +216,6 @@ def handle_annotation(click_data, add_clicks, delete_clicks, annotation_text):
     if ctx.triggered and "delete-annotations-btn" in ctx.triggered[0]["prop_id"]:
         annotations_store = []
 
-    # Recreate figure
     annotated_chart = px.line(
         df,
         x="Timestamp",
@@ -245,7 +234,6 @@ def handle_annotation(click_data, add_clicks, delete_clicks, annotation_text):
 
     return selected_point_info, annotated_chart
 
-# Callback for rendering data table
 @app.callback(
     Output("data-table-container", "children"),
     [Input("value-range-slider", "value"), Input("category-dropdown", "value"), Input("region-dropdown", "value"), Input("interval-component", "n_intervals")]
