@@ -76,6 +76,9 @@ Open your browser and navigate to:
 http://127.0.0.1:8050
 ```
 
+![Dashboard Screenshot](Executing_Script.png)
+
+
 ---
 
 ## How to Use
